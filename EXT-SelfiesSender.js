@@ -8,6 +8,8 @@ Module.register("EXT-SelfiesSender", {
   defaults: {
     debug: false,
     sendTelegramBot: true,
+    sendGooglePhotos: true,
+    sendMail: true
   },
 
   start: function() {
@@ -33,7 +35,7 @@ Module.register("EXT-SelfiesSender", {
       case "EXT_SELFIES-RESULT":
         if (!payload) return // prevent crash
         this.lastPhoto = payload
-        this.sendSelfieTB(payload)
+        this.sendSelfie(payload)
         break
       case "EXT_SELFIES-CLEAN_STORE": // all is clean so reset all
         this.lastPhoto = null
@@ -93,18 +95,21 @@ Module.register("EXT-SelfiesSender", {
     handler.reply("TEXT", "done.")
   },
 
-  sendSelfieTB: function(result) {
+  sendSelfie: function(result) {
     // send to the user with TBkey
+    let sendTBAdmin = true
     if (result.options.TBkey && this.session[result.options.TBkey]) {
+      sendTBAdmin= false
       var handler = this.session[result.options.TBkey]
       handler.reply("PHOTO_PATH", result.path)
       this.session[result.options.TBkey] = null
       delete this.session[result.options.TBkey]
-      return
     }
 
+    if (this.config.sendGooglePhotos) this.sendNotification("EXT_GPHOTOPHOTOS-UPLOAD", result.path)
+
     // send to admins
-    if (this.config.sendTelegramBot) {
+    if (this.config.sendTelegramBot && sendTBAdmin) {
       this.sendNotification("TELBOT_TELL_ADMIN", "New Selfie")
       this.sendNotification("TELBOT_TELL_ADMIN", {
         type: "PHOTO_PATH",
