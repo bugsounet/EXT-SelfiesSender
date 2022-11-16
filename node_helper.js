@@ -7,10 +7,12 @@
 var log = () => { /* do nothing */ };
 
 var NodeHelper = require("node_helper");
+var nodemailer = require("nodemailer");
 
 module.exports = NodeHelper.create({
   start: function() {
-
+    this.transporter = null
+    this.mailerIsReady = false
   },
 
   initialize: function(payload) {
@@ -19,8 +21,8 @@ module.exports = NodeHelper.create({
     if (payload.debug) {
       log = (...args) => { console.log("[SELFIES-SENDER]", ...args) }
     }
-    this.sendSocketNotification("INITIALIZED")
-
+    log("Config:", this.config)
+    if (this.config.sendMail) this.TestMailConfig()
   },
 
   socketNotificationReceived: function(noti, payload) {
@@ -28,6 +30,40 @@ module.exports = NodeHelper.create({
       case "INIT":
         this.initialize(payload)
         break
+      case "MAIL":
+        this.sendMail(payload)
+        break
     }
+  },
+
+  sendMail: function(file) {
+    if (!this.mailerIsReady) return console.error("[SELFIES-SENDER] sendMailConfig is not ready for send selfies by mail!")
+    try {
+      var msg = Object.assign({}, this.config.sendMailConfig.message, {attachments: [{path: file}]})
+      this.transporter.sendMail(msg, err => {
+        if (err) {
+          console.error("[SELFIES-SENDER] Error, Failed to send mail." , err)
+          return
+        }
+        log("Email sent successfully! [" + file + "]")
+      })
+    } catch (e) {
+      console.error("[SELFIES-SENDER] Error, Invalid mail account configuration.", e)
+      return
+    }
+  },
+
+  TestMailConfig: function() {
+    if (!typeof this.config.sendMailConfig == "object") return console.error("[SELFIES-SENDER] sendMailConfig is not configured!")
+    this.transporter = nodemailer.createTransport(this.config.sendMailConfig.transport)
+    this.transporter.verify(error => {
+      if (error) {
+        console.error("[SELFIES-SENDER] sendMailConfig", error)
+        this.mailerIsReady = false
+      } else {
+        console.log("[SELFIES-SENDER] Yes! We are able to send your selfies by mail.")
+        this.mailerIsReady = true
+      }
+    })
   }
 });

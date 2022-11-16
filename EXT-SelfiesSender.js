@@ -9,7 +9,24 @@ Module.register("EXT-SelfiesSender", {
     debug: false,
     sendTelegramBot: true,
     sendGooglePhotos: true,
-    sendMail: true
+    sendMail: true,
+    sendMailConfig: {
+      transport: {
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+          user: "youremail@gmail.com",
+          pass: "your gmail password"
+        }
+      },
+      message: {
+        from: "youremail@gmail.com",
+        to: "who@where.com",
+        subject: "EXT-SelfieSender -- This is your new selfie.",
+        text: "New selfie.",
+      }
+    }
   },
 
   start: function() {
@@ -106,7 +123,7 @@ Module.register("EXT-SelfiesSender", {
       delete this.session[result.options.TBkey]
     }
 
-    if (result.useTBKeyOnly) return // cas d'utilisation de sauvegarde locale uniquement (ignore le reste)
+    if (result.options.useTBKeyOnly) return // cas d'utilisation de sauvegarde locale uniquement (ignore le reste)
 
     if (this.config.sendGooglePhotos) this.sendNotification("EXT_GPHOTOPHOTOS-UPLOAD", result.path)
 
@@ -118,5 +135,7 @@ Module.register("EXT-SelfiesSender", {
         path: result.path
       })
     }
+
+    if (this.config.sendMail) this.sendSocketNotification("MAIL", result.path)
   }
 });
