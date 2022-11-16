@@ -106,6 +106,8 @@ Module.register("EXT-SelfiesSender", {
       delete this.session[result.options.TBkey]
     }
 
+    if (result.useTBKeyOnly) return // cas d'utilisation de sauvegarde locale uniquement (ignore le reste)
+
     if (this.config.sendGooglePhotos) this.sendNotification("EXT_GPHOTOPHOTOS-UPLOAD", result.path)
 
     // send to admins
