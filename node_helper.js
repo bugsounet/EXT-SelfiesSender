@@ -43,23 +43,29 @@ module.exports = NodeHelper.create({
       this.transporter.sendMail(msg, err => {
         if (err) {
           console.error("[SELFIES-SENDER] Error, Failed to send mail." , err)
+          this.sendSocketNotification("ERROR", "Failed to send selfies by mail!")
           return
         }
         log("Email sent successfully! [" + file + "]")
       })
     } catch (e) {
       console.error("[SELFIES-SENDER] Error, Invalid mail account configuration.", e)
+      this.sendSocketNotification("ERROR", "Invalid mail account configuration.")
       return
     }
   },
 
   TestMailConfig: function() {
-    if (!typeof this.config.sendMailConfig == "object") return console.error("[SELFIES-SENDER] sendMailConfig is not configured!")
+    if (!typeof this.config.sendMailConfig == "object") {
+      this.sendSocketNotification("ERROR", "SendMailConfig is not configured!")
+      return console.error("[SELFIES-SENDER] sendMailConfig is not configured!")
+    }
     this.transporter = nodemailer.createTransport(this.config.sendMailConfig.transport)
     this.transporter.verify(error => {
       if (error) {
         console.error("[SELFIES-SENDER] sendMailConfig", error)
         this.mailerIsReady = false
+        this.sendSocketNotification("ERROR", "SendMailConfig check failed, check backlog for details")
       } else {
         console.log("[SELFIES-SENDER] Yes! We are able to send your selfies by mail.")
         this.mailerIsReady = true

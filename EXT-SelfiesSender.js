@@ -15,21 +15,23 @@
 Module.register("EXT-SelfiesSender", {
   defaults: {
     debug: false,
-    sendTelegramBot: true,
-    sendGooglePhotos: true,
-    sendMail: true,
+    sendTelegramBotAuto: true,
+    sendGooglePhotos: false,
+    sendGooglePhotosAuto: false,
+    sendMail: false,
+    sendMailAuto: false,
     sendMailConfig: {
       transport: {
-        host: 'smtp.gmail.com',
+        host: 'smtp.mail.com',
         port: 465,
         secure: true,
         auth: {
-          user: "youremail@gmail.com",
-          pass: "your gmail password"
+          user: "youremail@mail.com",
+          pass: "your mail password"
         }
       },
       message: {
-        from: "youremail@gmail.com",
+        from: "EXT-SelfieSender <youremail@mail.com>",
         to: "who@where.com",
         subject: "EXT-SelfieSender -- This is your new selfie.",
         text: "New selfie.",
@@ -71,7 +73,11 @@ Module.register("EXT-SelfiesSender", {
 
   socketNotificationReceived: function(noti, payload) {
     switch(noti) {
-      //do something
+      case "ERROR": // will display error with EXT-Alert
+        this.sendNotification("EXT_ALERT", {
+          type: "error",
+          message: payload
+        })
     }
   },
 
@@ -106,7 +112,33 @@ Module.register("EXT-SelfiesSender", {
   cmdLastSelfie: function(command, handler) {
     if (this.IsShooting) return handler.reply("TEXT", "Not available actually.")
     if (this.lastPhoto) {
-      handler.reply("PHOTO_PATH", this.lastPhoto.path)
+      if (handler.args) {
+        var args = handler.args.toLowerCase().split(" ")
+        switch (args[0]) {
+          case "mail":
+            if (this.config.sendMail) this.sendSocketNotification("MAIL", this.lastPhoto.path)
+            handler.reply("TEXT", this.config.sendMail ? "Selfie sended by mail.": "Command disabled.")
+            break
+          case "screen":
+            this.sendNotification("EXT_SELFIES-LAST")
+            handler.reply("TEXT", "This is last selfie!")
+            break
+          case "gphotos":
+            if (this.config.sendGooglePhotos) this.sendNotification("EXT_GPHOTOPHOTOS-UPLOAD", this.lastPhoto.path)
+            handler.reply("TEXT", this.config.sendGooglePhotos ? "Selfie sended to EXT-GooglePhotos for upload.": "Command disabled.")
+            break
+          default:
+            handler.reply("TEXT", 'Need Help for /lastselfie commands ?\n\n\
+  *mail*: will send last photo by mail\n\
+  *screen*: will display last photo in the screen of MagicMirror²\n\
+  *gphotos*: will upload last selfie in google photo directory (need EXT-GooglePhotos)\n\
+  With no argument: will send last photo in private message\
+  ',{parse_mode:'Markdown'})
+            break
+        }
+      } else {
+        handler.reply("PHOTO_PATH", this.lastPhoto.path)
+      }
     } else {
       handler.reply("TEXT", "Couldn't find the last selfie.")
     }
@@ -133,10 +165,10 @@ Module.register("EXT-SelfiesSender", {
 
     if (result.options.useTBKeyOnly) return // cas d'utilisation de sauvegarde locale uniquement (ignore le reste)
 
-    if (this.config.sendGooglePhotos) this.sendNotification("EXT_GPHOTOPHOTOS-UPLOAD", result.path)
+    if (this.config.sendGooglePhotos && this.config.sendGooglePhotosAuto) this.sendNotification("EXT_GPHOTOPHOTOS-UPLOAD", result.path)
 
     // send to admins
-    if (this.config.sendTelegramBot && sendTBAdmin) {
+    if (this.config.sendTelegramBotAuto && sendTBAdmin) {
       this.sendNotification("TELBOT_TELL_ADMIN", "New Selfie")
       this.sendNotification("TELBOT_TELL_ADMIN", {
         type: "PHOTO_PATH",
@@ -144,6 +176,6 @@ Module.register("EXT-SelfiesSender", {
       })
     }
 
-    if (this.config.sendMail) this.sendSocketNotification("MAIL", result.path)
+    if (this.config.sendMail && this.config.sendMailAuto) this.sendSocketNotification("MAIL", result.path)
   }
 });
