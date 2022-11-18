@@ -4,14 +4,6 @@
 *  11/2022                *
 ***************************/
 
-/** Todo:
- * TB functionalities with /lastselfie
- * /lastselfie : will send last selfie to TB
- * /lastselfie mail : will send last selfie by mail
- * /lastselfie ?gphoto? : will send last selfie to Google Photos (? = name not defined...)
- * /lastselfie screen : will display last selfie on the screen
- **/
-
 Module.register("EXT-SelfiesSender", {
   defaults: {
     debug: false,
