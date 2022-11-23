@@ -26,7 +26,7 @@ Module.register("EXT-SelfiesSender", {
         from: "EXT-SelfieSender <youremail@mail.com>",
         to: "who@where.com",
         subject: "EXT-SelfieSender -- This is your new selfie.",
-        text: "New selfie.",
+        text: "New selfie."
       }
     }
   },
