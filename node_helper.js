@@ -8,6 +8,8 @@ var log = () => { /* do nothing */ };
 
 var NodeHelper = require("node_helper");
 var nodemailer = require("nodemailer");
+var fs = require("fs");
+var lp = require("node-lp");
 
 module.exports = NodeHelper.create({
   start: function() {
@@ -32,6 +34,9 @@ module.exports = NodeHelper.create({
         break
       case "MAIL":
         this.sendMail(payload)
+        break
+      case "PRINT":
+        this.sendToPrinter(payload)
         break
     }
   },
@@ -71,5 +76,24 @@ module.exports = NodeHelper.create({
         this.mailerIsReady = true
       }
     })
+  },
+  
+  sendToPrinter: function(payload, data) {
+    if (payload.path) {
+      fs.writeFile(payload.path, 
+        err => {
+          if (err) {
+            this.sendSocketNotification("ERROR", "Error when sended to printer last shoot!") // will inform user with EXT-Alert 
+            return console.log("[SELFIES] Sended to printer Error:", err)
+          }
+          log("File printed:", payload.uri)
+        }
+    )}
+  
+    if (Buffer.isBuffer(data)) {
+      spawn.withData(data, payload);
+    } else {
+      spawn.withFile(data, payload);
+    }
   }
 });

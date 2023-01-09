@@ -12,6 +12,8 @@ Module.register("EXT-SelfiesSender", {
     sendGooglePhotosAuto: false,
     sendMail: false,
     sendMailAuto: false,
+    sendToPrinter: false,
+    sendToPrinterAuto: false, // ou pas ?
     sendMailConfig: {
       transport: {
         host: 'smtp.mail.com',
@@ -28,7 +30,8 @@ Module.register("EXT-SelfiesSender", {
         subject: "EXT-SelfieSender -- This is your new selfie.",
         text: "New selfie."
       }
-    }
+    },
+    printerOptions: {}  // needed ?
   },
 
   start: function() {
@@ -157,8 +160,7 @@ Module.register("EXT-SelfiesSender", {
 
     if (result.options.useTBKeyOnly) return // cas d'utilisation de sauvegarde locale uniquement (ignore le reste)
 
-    if (this.config.sendGooglePhotos && this.config.sendGooglePhotosAuto) this.sendNotification("EXT_GPHOTOPHOTOS-UPLOAD", result.path)
-
+    if (this.config.sendGooglePhotos && this.config.sendGooglePhotosAuto) this.sendNotification("EXT_GPHOTOPHOTOS-UPLOAD", result.path)    
     // send to admins
     if (this.config.sendTelegramBotAuto && sendTBAdmin) {
       this.sendNotification("TELBOT_TELL_ADMIN", "New Selfie")
@@ -169,5 +171,7 @@ Module.register("EXT-SelfiesSender", {
     }
 
     if (this.config.sendMail && this.config.sendMailAuto) this.sendSocketNotification("MAIL", result.path)
+  
+    if (this.config.sendToPrinter && this.config.sendToPrinterAuto) this.sendSocketNotification("PRINT", result.path)
   }
 });
