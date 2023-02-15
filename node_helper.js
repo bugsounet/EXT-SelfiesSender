@@ -14,6 +14,7 @@ var printer = require("node-lp");
 module.exports = NodeHelper.create({
   start: function() {
     this.transporter = null
+    this.printer = null
     this.mailerIsReady = false
   },
 
@@ -83,27 +84,15 @@ module.exports = NodeHelper.create({
    if (!typeof this.config.printerOptions == "object") {
    return console.error("[SELFIES-SENDER] printer is not configured!")
    }
-   this.printer(error => {
-    if (error) {
-     console.error("[SELFIES-SENDER] sendPrinter", error)
-      this.sendSocketNotification("ERROR", "SendPrinterOptions check failed, check backlog for details")
-    } else {
-     console.log("[SELFIES-SENDER] Yes! We are able to print your selfies.")
-     printer = new lp(this.config.printerOptions)
-    }
-   })
+   this.printer = new lp(this.config.printerOptions)
+   console.log("[SELFIES-SENDER] Yes! We are able to print your selfies.")
   },
     
   sendToPrint: function(payload) {
-   try {
-    printer.queue (payload,err => {
-     if (err) return console.error("[SELFIES-SENDER] Print Error:", error)
-     log("Print successfull! [" + payload + "]")
-    })
-   }
-   catch (e) {
-    console.error("[SELFIES-SENDER] Error, invalid printer options", e)
-    return
-   }
+   var printer = this.printer
+   printer.queue (payload,err => {
+    if (err) return console.error("[SELFIES-SENDER] Print Error:", error)
+    log("Print successfull! [" + payload + "]")
+   })
   }
 })
