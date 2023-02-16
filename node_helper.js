@@ -9,13 +9,13 @@ var log = () => { /* do nothing */ };
 var NodeHelper = require("node_helper");
 var nodemailer = require("nodemailer");
 var lp = require("node-lp");
-var printer = require("node-lp");
 
 module.exports = NodeHelper.create({
   start: function() {
     this.transporter = null
     this.printer = null
     this.mailerIsReady = false
+    this.printerIsReady = false
   },
 
   initialize: function(payload) {
@@ -26,7 +26,7 @@ module.exports = NodeHelper.create({
     }
     log("Config:", this.config)
     if (this.config.sendMail) this.TestMailConfig()
-    if(this.config.sendToPrinter) this.InitPrinter()
+    if (this.config.sendToPrinter) this.InitPrinter()
   },
 
   socketNotificationReceived: function(noti, payload) {
@@ -63,7 +63,7 @@ module.exports = NodeHelper.create({
   },
 
   TestMailConfig: function() {
-    if (!typeof this.config.sendMailConfig == "object") {
+    if (typeof this.config.sendMailConfig != "object") {
       this.sendSocketNotification("ERROR", "SendMailConfig is not configured!")
       return console.error("[SELFIES-SENDER] sendMailConfig is not configured!")
     }
@@ -81,16 +81,18 @@ module.exports = NodeHelper.create({
   },
 
   InitPrinter: function() {
-   if (!typeof this.config.printerOptions == "object") {
-   return console.error("[SELFIES-SENDER] printer is not configured!")
-   }
-   this.printer = new lp(this.config.printerOptions)
-   console.log("[SELFIES-SENDER] Yes! We are able to print your selfies.")
+    if (typeof this.config.printerOptions != "object") {
+      this.printerIsReady = false
+      return console.error("[SELFIES-SENDER] printer is not configured!")
+    }
+    this.printer = new lp(this.config.printerOptions)
+    this.printerIsReady = true
+    console.log("[SELFIES-SENDER] Yes! We are able to print your selfies.")
   },
     
   sendToPrint: function(payload) {
-   var printer = this.printer
-   printer.queue (payload,err => {
+    if (!this.printerIsReady) return console.error("[SELFIES-SENDER] Printer is not ready")
+    this.printer.queue (payload,err => {
     if (err) return console.error("[SELFIES-SENDER] Print Error:", error)
     log("Print successfull! [" + payload + "]")
    })
