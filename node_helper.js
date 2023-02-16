@@ -93,7 +93,7 @@ module.exports = NodeHelper.create({
   sendToPrint: function(payload) {
     if (!this.printerIsReady) return console.error("[SELFIES-SENDER] Printer is not ready")
     this.printer.queue (payload,err => {
-    if (err) return console.error("[SELFIES-SENDER] Print Error:", error)
+    if (err) return console.error("[SELFIES-SENDER] Print Error:", err)
     log("Print successfull! [" + payload + "]")
    })
   }
