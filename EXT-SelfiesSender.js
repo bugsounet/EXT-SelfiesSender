@@ -74,7 +74,7 @@ Module.register("EXT-SelfiesSender", {
   },
 
  /** TelegramBot function **/
-   getCommands: function(commander) {
+   EXT_TELBOTCommands: function(commander) {
     commander.add({
       command: 'selfie',
       callback: 'cmdSelfie',
