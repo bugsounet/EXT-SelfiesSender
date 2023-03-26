@@ -1,7 +1,7 @@
 /**************************
-*  EXT-SelfiesSender v1.0 *
+*  EXT-SelfiesSender v1.1 *
 *  Bugsounet              *
-*  11/2022                *
+*  03/2023                *
 ***************************/
 
 Module.register("EXT-SelfiesSender", {
@@ -35,6 +35,7 @@ Module.register("EXT-SelfiesSender", {
     this.IsShooting = false
     this.lastPhoto = null
     this.session = {}
+    this.ready = false
   },
 
   getDom: function() {
@@ -45,18 +46,20 @@ Module.register("EXT-SelfiesSender", {
 
   notificationReceived: function(noti, payload, sender) {
     switch(noti) {
-      case "DOM_OBJECTS_CREATED":
-        this.sendSocketNotification("INIT", this.config)
-        break
-      case "GAv5_READY":
-        if (sender.name == "MMM-GoogleAssistant") this.sendNotification("EXT_HELLO", this.name)
+      case "GW_READY":
+        if (sender.name == "Gateway") {
+          this.sendSocketNotification("INIT", this.config)
+          this.ready= true
+          this.sendNotification("EXT_HELLO", this.name)
+        }
         break
       case "EXT_SELFIES-RESULT":
-        if (!payload) return // prevent crash
+        if (!payload || !this.ready) return // prevent crash
         this.lastPhoto = payload
         this.sendSelfie(payload)
         break
       case "EXT_SELFIES-CLEAN_STORE": // all is clean so reset all
+        if (!this.ready) return
         this.lastPhoto = null
         this.session = {}
         break
@@ -74,7 +77,7 @@ Module.register("EXT-SelfiesSender", {
   },
 
  /** TelegramBot function **/
-   EXT_TELBOTCommands: function(commander) {
+  EXT_TELBOTCommands: function(commander) {
     commander.add({
       command: 'selfie',
       callback: 'cmdSelfie',
