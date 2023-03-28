@@ -1,7 +1,7 @@
 /**************************
-*  EXT-SelfiesSender v1.0 *
+*  EXT-SelfiesSender v1.1 *
 *  Bugsounet              *
-*  11/2022                *
+*  03/2023                *
 ***************************/
 
 var log = () => { /* do nothing */ };
@@ -18,10 +18,7 @@ module.exports = NodeHelper.create({
   initialize: function(payload) {
     console.log("[SELFIES-SENDER] EXT-SelfiesSender Version:", require('./package.json').version, "rev:", require('./package.json').rev)
     this.config = payload
-    if (payload.debug) {
-      log = (...args) => { console.log("[SELFIES-SENDER]", ...args) }
-    }
-    log("Config:", this.config)
+    if (payload.debug) log = (...args) => { console.log("[SELFIES-SENDER]", ...args) }
     if (this.config.sendMail) this.TestMailConfig()
   },
 
