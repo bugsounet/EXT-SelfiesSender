@@ -164,8 +164,8 @@ Module.register("EXT-SelfiesSender", {
 
     // send to admins
     if (this.config.sendTelegramBotAuto && sendTBAdmin) {
-      this.sendNotification("TELBOT_TELL_ADMIN", "New Selfie")
-      this.sendNotification("TELBOT_TELL_ADMIN", {
+      this.sendNotification("EXT_TELBOT-TELL_ADMIN", "New Selfie")
+      this.sendNotification("EXT_TELBOT-TELL_ADMIN", {
         type: "PHOTO_PATH",
         path: result.path
       })
