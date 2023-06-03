@@ -1,7 +1,7 @@
 {
   "name": "EXT-SelfiesSender",
-  "version": "1.1.0",
-  "rev": "230326",
+  "version": "1.1.1",
+  "rev": "230603",
   "description": "Sender plugin for EXT-Selfies",
   "main": "EXT-SelfiesSender.js",
   "scripts": {
