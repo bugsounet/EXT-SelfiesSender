@@ -1,12 +1,12 @@
 {
   "name": "EXT-SelfiesSender",
-  "version": "1.1.1",
-  "rev": "230603",
+  "version": "1.1.2",
+  "rev": "230723",
   "description": "Sender plugin for EXT-Selfies",
   "main": "EXT-SelfiesSender.js",
   "scripts": {
     "preinstall": "installer/preinstall.sh",
-    "postinstall": "installer/postinstall.sh",
+    "postinstall": "installer/postinstall.sh -m",
     "update": "installer/update.sh",
     "reset": "git reset --hard",
     "clean": "rm -rf node_modules package-lock.json"
@@ -24,9 +24,8 @@
   },
   "homepage": "https://wiki.bugsounet.fr",
   "dependencies": {
-    "check-node-version": "^4.2.1",
-    "glob": "^9.3.2",
-    "minify": "^9.2.0",
+    "esbuild": "^0.18.16",
+    "glob": "^10.3.3",
     "nodemailer": "^6.8.0"
   }
 }
