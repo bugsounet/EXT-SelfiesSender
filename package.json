@@ -26,6 +26,6 @@
   "dependencies": {
     "esbuild": "^0.20.0",
     "glob": "^10.3.10",
-    "nodemailer": "^6.9.8"
+    "nodemailer": "^6.9.9"
   }
 }
