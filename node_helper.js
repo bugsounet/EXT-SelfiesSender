@@ -51,7 +51,7 @@ module.exports = NodeHelper.create({
   },
 
   TestMailConfig () {
-    if (!typeof this.config.sendMailConfig == "object") {
+    if (!typeof this.config.sendMailConfig === "object") {
       this.sendSocketNotification("ERROR", "SendMailConfig is not configured!");
       return console.error("[SELFIES-SENDER] sendMailConfig is not configured!");
     }
