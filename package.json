@@ -36,7 +36,7 @@
   "homepage": "https://wiki.bugsounet.fr",
   "dependencies": {
     "esbuild": "^0.21.5",
-    "glob": "^10.4.1",
+    "glob": "^10.4.2",
     "nodemailer": "^6.9.13"
   },
   "devDependencies": {
