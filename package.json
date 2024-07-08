@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "esbuild": "^0.22.0",
-    "glob": "^10.4.2",
+    "glob": "^10.4.3",
     "nodemailer": "^6.9.14"
   },
   "devDependencies": {
